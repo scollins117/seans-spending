@@ -1,28 +1,22 @@
 const express = require("express");
-const logger = require("morgan");
 const mongoose = require("mongoose");
-const compression = require("compression");
-
-const PORT = process.env.PORT || 3001;
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/seans_spending";
 
 const app = express();
+const PORT = process.env.PORT || 3001;
 
-app.use(logger("dev"));
-
-app.use(compression());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-mongoose.connect(MONGODB_URI, {
+app.use(require("./routes/api.js"));
+
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/seans-spending', {
   useNewUrlParser: true,
-  useFindAndModify: false
+  useUnifiedTopology: true
 });
 
-// routes
-app.use(require("./routes/api.js"));
+// Use this to log mongo queries being executed!
+mongoose.set('debug', true);
 
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}!`);
